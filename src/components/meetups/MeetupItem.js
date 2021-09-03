@@ -1,27 +1,47 @@
-import { Component } from 'react';
-import Card from '../ui/Card';
-import classes from './MeetupItem.module.css'
+import { useContext } from 'react';
 
-class MeetupItem extends Component {
-    render() {
-        return (
-            <Card>
-                <li className={classes.item}>
-                    <div className={classes.image}>
-                        <img src={this.props.image} alt={this.props.title} />
-                    </div>
-                    <div className={classes.content}>
-                        <h3>{this.props.title}</h3>
-                        <address>{this.props.address}</address>
-                        <p>{this.props.description}</p>
-                    </div>
-                    <div className={classes.actions}>
-                        <button>To Favourites</button>
-                    </div>
-                </li>
-            </Card>
-        )
+import Card from '../ui/Card';
+import classes from './MeetupItem.module.css';
+import FavouritesContext from '../../store/favourites-context';
+
+function MeetupItem(props) {
+  const favouritesCtx = useContext(FavouritesContext);
+
+  const itemIsFavourite = favouritesCtx.itemIsFavourite(props.id);
+
+  function toggleFavouriteStatusHandler() {
+    if (itemIsFavourite) {
+      favouritesCtx.removeFavourite(props.id);
+    } else {
+      favouritesCtx.addFavourite({
+        id: props.id,
+        title: props.title,
+        description: props.description,
+        image: props.image,
+        address: props.address,
+      });
     }
+  }
+
+  return (
+    <li className={classes.item}>
+      <Card>
+        <div className={classes.image}>
+          <img src={props.image} alt={props.title} />
+        </div>
+        <div className={classes.content}>
+          <h3>{props.title}</h3>
+          <address>{props.address}</address>
+          <p>{props.description}</p>
+        </div>
+        <div className={classes.actions}>
+          <button onClick={toggleFavouriteStatusHandler}>
+            {itemIsFavourite ? 'Remove from Favourites' : 'To Favourites'}
+          </button>
+        </div>
+      </Card>
+    </li>
+  );
 }
 
 export default MeetupItem;
